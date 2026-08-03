@@ -1,0 +1,11 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# 本地临时文件
+*.tmp
+
+# 注意：examples/ 下的演示输入输出故意保留，作为能力证明

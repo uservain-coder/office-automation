@@ -2,6 +2,8 @@
 
 > 计算机专业 / Python 办公自动化 —— 帮人把重复 8 小时的活儿，压到 1 分钟跑完。
 
+🌐 **在线展示页**：https://uservain-coder.github.io/office-automation/（需在仓库 `Settings → Pages` 启用 `main` 分支 `/ (root)` 后生效）
+
 我是计算机专业的，用 Python 写脚本解决日常办公里那些「重复、机械、容易出错」的活：
 Excel 批量合并、PDF 转 Excel、文件批量整理、工资条生成…… **你描述需求，我写脚本，你点一下就完事。**
 
@@ -32,6 +34,7 @@ office-automation/
 │   └── make_examples.py     # 一键生成脱敏示例
 ├── docs/                    # 每个脚本的详细用法文档
 ├── requirements.txt
+├── index.html                 # GitHub Pages 在线展示页（深色科技风）
 └── README.md
 ```
 

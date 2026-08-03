@@ -73,7 +73,7 @@ python scripts/payroll.py      --input examples/payroll/master.xlsx --output exa
 ## 💡 技术服务说明
 
 本仓库是**能力展示**用途。如果你有具体的办公自动化需求（Excel 报表、PDF 提取、批量处理、工资条等），
-欢迎走闲鱼找我定制：**{{你的闲鱼昵称}}**（简介挂了本仓库链接作为案例背书）。
+欢迎走闲鱼找我定制：**https://m.tb.cn/h.8f3TO2g?tk=fKtsgxwuJyu**（简介挂了本仓库链接作为案例背书）。
 
 - 先聊需求再报价，不乱收费
 - 交付附简单使用说明

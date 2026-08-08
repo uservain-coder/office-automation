@@ -11,8 +11,13 @@
 """
 import argparse
 import os
+import sys
 
 import pandas as pd
+
+# 统一的中文字体（嵌入子集，确保腾讯文档/浏览器等网页阅读器也能显示中文）
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from cn_font import register_cn_font, CN_FONT
 
 
 # 默认工资条字段（可用 --fields 覆盖，逗号分隔）
@@ -56,13 +61,14 @@ def to_pdf(df, fields, output_path):
         from reportlab.pdfgen import canvas
     except ImportError:
         raise SystemExit("❌ 生成 PDF 需要 reportlab，请先 pip install reportlab，或改用 --format xlsx")
+    register_cn_font()  # 注册并嵌入中文字体（关键：否则中文在网页阅读器中不显示）
     key = "姓名" if "姓名" in df.columns else df.columns[0]
     c = canvas.Canvas(output_path, pagesize=A4)
     w, h = A4
     for _, row in df.iterrows():
-        c.setFont("Helvetica-Bold", 16)
+        c.setFont(CN_FONT, 16)
         c.drawString(60, h - 80, f"工资条 - {row.get(key, '')}")
-        c.setFont("Helvetica", 12)
+        c.setFont(CN_FONT, 12)
         y = h - 120
         for label, val in build_one(row, fields):
             c.drawString(80, y, f"{label}：{val}")

@@ -111,13 +111,14 @@ pd.DataFrame(payroll, columns=["姓名", "部门", "应发", "扣款", "实发"]
 
 # ---- 示例4：10 页 PDF（每页含文本+表格，用于 pdf_extract 测试）----
 # 场景：虚构公司「青松数字科技」2025 年 1–10 月采购对账报告（全脱敏，无真实业务信息）
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, PageBreak
 
-pdfmetrics.registerFont(UnicodeCIDFont("STSong-Light"))
-_CN = "STSong-Light"
+# 统一嵌入中文字体（与 payroll.py 一致，确保生成的 PDF 在腾讯文档/浏览器均可显示）
+import sys as _sys
+_sys.path.insert(0, os.path.join(BASE, "..", "scripts"))
+from cn_font import register_cn_font, CN_FONT
+_CN = register_cn_font()
 
 _pdf_styles = getSampleStyleSheet()
 _title_style = ParagraphStyle("CNTitle", parent=_pdf_styles["Title"], fontName=_CN, fontSize=15, spaceAfter=6)

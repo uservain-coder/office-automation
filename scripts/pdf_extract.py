@@ -39,6 +39,36 @@ def extract_tables(pdf_path, pages):
     return results
 
 
+def clean_text(text):
+    """清理文本，移除 openpyxl 不允许的字符"""
+    if not text:
+        return ""
+    
+    # 移除控制字符（除了常见的换行符、制表符等）
+    import re
+    # 移除控制字符（除了常见的换行符、制表符等）
+    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]', '', text)
+    # 替换一些可能导致问题的特殊字符
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
+    
+    # 移除 openpyxl 在单元格内容中不允许的字符
+    # 主要是一些控制字符和特殊符号
+    problematic_chars = [
+        '\u0000', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005', '\u0006', '\u0007',
+        '\u0008', '\u000b', '\u000c', '\u000e', '\u000f', '\u0010', '\u0011', '\u0012',
+        '\u0013', '\u0014', '\u0015', '\u0016', '\u0017', '\u0018', '\u0019', '\u001a',
+        '\u001b', '\u001c', '\u001d', '\u001e', '\u001f', '\u007f', '\u0080', '\u0081',
+        '\u0082', '\u0083', '\u0084', '\u0085', '\u0086', '\u0087', '\u0088', '\u0089',
+        '\u008a', '\u008b', '\u008c', '\u008d', '\u008e', '\u008f', '\u0090', '\u0091',
+        '\u0092', '\u0093', '\u0094', '\u0095', '\u0096', '\u0097', '\u0098', '\u0099',
+        '\u009a', '\u009b', '\u009c', '\u009d', '\u009e', '\u009f'
+    ]
+    
+    for char in problematic_chars:
+        text = text.replace(char, '')
+    
+    return text.strip()
+
 def extract_text(pdf_path, pages, per_page):
     """提取文本。per_page=True 时每页一个 sheet。"""
     sheets = {}
@@ -49,12 +79,14 @@ def extract_text(pdf_path, pages, per_page):
             txt = pdf.pages[i].extract_text() or ""
             if not txt.strip():
                 print(f"   ⚠ 第 {i+1} 页无文字层（可能是扫描件）")
+            # 清理文本后再处理
+            cleaned_txt = clean_text(txt)
             if per_page:
-                sheets[f"第{i+1}页"] = pd.DataFrame({"内容": txt.splitlines()})
+                sheets[f"第{i+1}页"] = pd.DataFrame({"内容": cleaned_txt.splitlines()})
             else:
                 sheets.setdefault("全文", pd.DataFrame())
                 sheets["全文"] = pd.concat(
-                    [sheets["全文"], pd.DataFrame({"内容": txt.splitlines()})],
+                    [sheets["全文"], pd.DataFrame({"内容": cleaned_txt.splitlines()})],
                     ignore_index=True)
     return sheets
 

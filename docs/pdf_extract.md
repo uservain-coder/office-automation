@@ -27,9 +27,26 @@ python scripts/pdf_extract.py --input examples/pdf/sample_invoice.pdf --output e
 - `--output`：输出 xlsx
 - `--mode`：`text` / `tables`
 - `--pages`：页码范围，如 `1,3,5-7`（默认全部）
-- `--per-page`：text 模式下每页一个 sheet
 
 
+
+# 提取表格，仅1、3页
+
+`python scripts/pdf_extract.py --input examples/pdf/sample_invoice.pdf --output examples/out_pdf_tables.xlsx --mode tables --pages 1,3`
+
+#提取表格，第5页
+
+`python scripts/pdf_extract.py --input examples/pdf/sample_invoice.pdf --output examples/out_pdf_tables.xlsx --mode tables --pages 5`
+
+# 提取全文，仅2~4页，每页一个sheet
+
+`python scripts/pdf_extract.py --input examples/pdf/sample_invoice.pdf --output examples/out_pdf_text.xlsx --mode text --per-page --pages 2-4`
+
+- `--per‑page`：可选
+
+开启后：PDF每一页 → Excel 生成独立 sheet。
+
+如果删掉--per‑page，所有页面文字全部合并放到 Excel 同一个 sheet 里面。
 
 ## 注意
 

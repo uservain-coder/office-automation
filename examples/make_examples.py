@@ -109,20 +109,72 @@ payroll = [
 pd.DataFrame(payroll, columns=["姓名", "部门", "应发", "扣款", "实发"]).to_excel(
     os.path.join(PAY_DIR, "master.xlsx"), index=False)
 
-# ---- 示例4：带网格表格的 PDF（用于 pdf_extract 测试）----
+# ---- 示例4：10 页 PDF（每页含文本+表格，用于 pdf_extract 测试）----
+# 场景：虚构公司「青松数字科技」2025 年 1–10 月采购对账报告（全脱敏，无真实业务信息）
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, PageBreak
+
+pdfmetrics.registerFont(UnicodeCIDFont("STSong-Light"))
+_CN = "STSong-Light"
+
+_pdf_styles = getSampleStyleSheet()
+_title_style = ParagraphStyle("CNTitle", parent=_pdf_styles["Title"], fontName=_CN, fontSize=15, spaceAfter=6)
+_para_style = ParagraphStyle("CNPara", parent=_pdf_styles["Normal"], fontName=_CN, fontSize=10.5, leading=16, spaceAfter=8)
+
+import random
+random.seed(20250808)
+_items_pool = [
+    ("笔记本电脑", 1, 5200), ("显示器", 2, 1099), ("机械键盘", 3, 199),
+    ("无线鼠标", 5, 89), ("A4打印纸(箱)", 4, 150), ("人体工学椅", 1, 680),
+    ("企业路由器", 1, 320), ("U盘 64G", 10, 45), ("插线板", 2, 60),
+    ("打印机墨盒", 3, 130), ("云服务器(月)", 1, 299), ("激光硒鼓", 2, 210),
+]
+_months = [f"2025年{i}月" for i in range(1, 11)]
+_bullets = [
+    "以办公设备更新为主，兼顾日常耗材补充。",
+    "新增项目组入驻，临时增配外设若干。",
+    "季度采购，批量下单以获取更低单价。",
+    "以打印与网络耗材为主，设备支出较少。",
+    "年中盘点后补全短缺物资。",
+    "配合系统上云，增加服务器与存储投入。",
+    "暑期运维窗口，集中更换老化设备。",
+    "按预算执行，支出平稳。",
+    "为下半年项目储备耗材。",
+    "年末结算，清理剩余预算并补采。",
+]
+_story = []
+for idx, month in enumerate(_months):
+    _rows = random.sample(_items_pool, k=random.randint(4, 5))
+    _total = 0
+    _table_data = [["物品", "数量", "单价(元)", "小计(元)"]]
+    for name, qty, price in _rows:
+        subtotal = qty * price
+        _total += subtotal
+        _table_data.append([name, str(qty), f"{price:,}", f"{subtotal:,}"])
+    _tbl = Table(_table_data, colWidths=[150, 60, 90, 90])
+    _tbl.setStyle(TableStyle([
+        ("FONTNAME", (0, 0), (-1, -1), _CN),
+        ("FONTSIZE", (0, 0), (-1, -1), 10),
+        ("GRID", (0, 0), (-1, -1), 0.5, (0, 0, 0)),
+        ("BACKGROUND", (0, 0), (-1, 0), (0.85, 0.9, 0.95)),
+        ("ALIGN", (1, 0), (-1, -1), "CENTER"),
+    ]))
+    _story.append(Paragraph(f"青松数字科技 · 采购对账报告（{month}）", _title_style))
+    _story.append(Paragraph(
+        f"本月公司共采购物资 {len(_rows)} 项，合计支出 ¥{_total:,}。"
+        f"采购说明：{_bullets[idx]}各项明细如下表所示，"
+        f"本报告所有数据均为演示用途，不含任何真实业务信息。",
+        _para_style))
+    _story.append(_tbl)
+    if idx != len(_months) - 1:
+        _story.append(PageBreak())
+
 pdf_path = os.path.join(PDF_DIR, "sample_invoice.pdf")
-doc = SimpleDocTemplate(pdf_path, pagesize=A4)
-data = [["物品", "数量", "单价"],
-        ["键盘", "2", "199"],
-        ["鼠标", "5", "89"],
-        ["显示器", "1", "1099"]]
-tbl = Table(data, colWidths=[120, 80, 80])
-tbl.setStyle(TableStyle([
-    ("GRID", (0, 0), (-1, -1), 0.5, (0, 0, 0)),
-    ("BACKGROUND", (0, 0), (-1, 0), (0.9, 0.9, 0.9)),
-    ("FONTSIZE", (0, 0), (-1, -1), 11),
-]))
-doc.build([tbl])
+doc = SimpleDocTemplate(pdf_path, pagesize=A4,
+                        leftMargin=54, rightMargin=54, topMargin=54, bottomMargin=54)
+doc.build(_story)
 
 print("✅ 脱敏示例数据已生成：")
 print("  examples/excel/sales_0{1,2,3}.xlsx  (合并演示)")
